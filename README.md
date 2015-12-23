@@ -5,7 +5,7 @@ A few exercises to get familiar with some distributed system concepts and their 
 This project provides the following exercises and even offers some simplistic solutions for students of distributed systems:
 * Investigate several ways one can create a virtual machine on a physical machine
   * Task: Fulfill the test cases in [TestVMCreation](https://github.com/kecskemeti/dcf-exercises/blob/master/src/test/java/hu/unimiskolc/iit/distsys/TestVMCreation.java)
-  * An example solution: (SolutionVMC)[https://github.com/kecskemeti/dcf-exercises/blob/master/src/main/java/hu/unimiskolc/iit/distsys/solution/SolutionVMC.java]
+  * An example solution: [SolutionVMC](https://github.com/kecskemeti/dcf-exercises/blob/master/src/main/java/hu/unimiskolc/iit/distsys/solution/SolutionVMC.java)
 * Analyze techniques to fill in an inhomogeneous computing infrastructure with virtual machines, then apply round robin job scheduling on top of the created VMs
   * Task: Fulfill the test case in [TestRoundRobinJobSched](https://github.com/kecskemeti/dcf-exercises/blob/master/src/test/java/hu/unimiskolc/iit/distsys/TestRoundRobinJobSched.java)
   * An example solution: 

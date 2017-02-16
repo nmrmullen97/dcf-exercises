@@ -90,25 +90,26 @@ public class PMDeregPreparator implements VirtualMachine.StateChange {
 	}
 
 	private void addnewAllocation() throws VMManagementException {
-		PhysicalMachine.ResourceAllocation ra = pm.allocateResources(pm.freeCapacities, false,
-				PhysicalMachine.migrationAllocLen );
-		if (ra != null) {
-			ras.add(ra);
-		}
-		new DeferredEvent(PhysicalMachine.migrationAllocLen - 1) {
-			@Override
-			protected void eventAction() {
-				if (callbackPending) {
-					clearAllocations();
-					try {
-						addnewAllocation();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
+		if (pm.getState().equals(PhysicalMachine.State.RUNNING)) {
+			PhysicalMachine.ResourceAllocation ra = pm.allocateResources(pm.freeCapacities, false,
+					PhysicalMachine.migrationAllocLen);
+			if (ra != null) {
+				ras.add(ra);
+			}
+			new DeferredEvent(PhysicalMachine.migrationAllocLen - 1) {
+				@Override
+				protected void eventAction() {
+					if (callbackPending) {
+						clearAllocations();
+						try {
+							addnewAllocation();
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
 					}
 				}
-			}
-		};
-
+			};
+		}
 	}
 
 	/**

@@ -39,11 +39,29 @@ public class PMForwarder extends PhysicalMachine implements ForwardingRecorder {
 	private boolean allocVMCalled = false;
 	private boolean deployVMCalled = false;
 	private final double reliMult;
+	private final double maxConsumption;
 
+	/**
+	 * 
+	 * @param cores
+	 * @param perCorePocessing
+	 * @param memory
+	 * @param disk
+	 * @param onD
+	 * @param offD
+	 * @param powerTransitions
+	 * @param reliMult The higher the value the less reliable the machine is
+	 */
 	public PMForwarder(double cores, double perCorePocessing, long memory, Repository disk, int onD, int offD,
 			EnumMap<PowerStateKind, EnumMap<State, PowerState>> powerTransitions, double reliMult) {
 		super(cores, perCorePocessing, memory, disk, onD, offD, powerTransitions);
 		this.reliMult = reliMult;
+		double collectedConsumptionData = 0;
+		for (EnumMap<State, PowerState> psData : powerTransitions.values()) {
+			PowerState maxConsumingState = psData.get(PhysicalMachine.State.RUNNING);
+			collectedConsumptionData += maxConsumingState.getConsumptionRange() + maxConsumingState.getMinConsumption();
+		}
+		maxConsumption = collectedConsumptionData;
 	}
 
 	public void resetForwardingData() {
@@ -68,6 +86,10 @@ public class PMForwarder extends PhysicalMachine implements ForwardingRecorder {
 		return reliMult;
 	}
 
+	public double getMaxConsumption() {
+		return maxConsumption;
+	}
+
 	@Override
 	public VirtualMachine[] requestVM(VirtualAppliance va, ResourceConstraints rc, Repository vaSource, int count)
 			throws hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException, NetworkException {
@@ -78,7 +100,7 @@ public class PMForwarder extends PhysicalMachine implements ForwardingRecorder {
 	@Override
 	public VirtualMachine[] requestVM(VirtualAppliance va, ResourceConstraints rc, Repository vaSource, int count,
 			HashMap<String, Object> schedulingConstraints)
-					throws hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException, NetworkException {
+			throws hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException, NetworkException {
 		reqVMCalled = true;
 		return super.requestVM(va, rc, vaSource, count, schedulingConstraints);
 	}
@@ -93,8 +115,13 @@ public class PMForwarder extends PhysicalMachine implements ForwardingRecorder {
 	@Override
 	public ResourceAllocation allocateResources(ResourceConstraints requested, boolean strict,
 			int allocationValidityLength)
-					throws hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException {
+			throws hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException {
 		allocVMCalled = true;
 		return super.allocateResources(requested, strict, allocationValidityLength);
+	}
+
+	@Override
+	public String toString() {
+		return "(PMForwarder: reli=" + reliMult + " totPower=" + maxConsumption + " " + super.toString() + ")";
 	}
 }

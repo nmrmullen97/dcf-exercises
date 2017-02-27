@@ -37,30 +37,9 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine.State;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ConstantConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.unimiskolc.iit.distsys.forwarders.IaaSForwarder;
-import hu.unimiskolc.iit.distsys.forwarders.PMForwarder;
 
 public class CostAnalyserandPricer extends Timed
 		implements VMManager.CapacityChangeEvent<PhysicalMachine>, IaaSForwarder.VMListener {
-	private class PMAmortizationRecord {
-		public final PhysicalMachine pm;
-		private double currentMachinePrice;
-		private final double amortizationRate;
-
-		public PMAmortizationRecord(PhysicalMachine forMe) {
-			pm = forMe;
-			currentMachinePrice = perMachineCost / ((PMForwarder) forMe).getReliMult();
-			amortizationRate = currentMachinePrice * hourlyAmortisaiton;
-		}
-
-		public void amortizefor(int hours) {
-			currentMachinePrice -= hours * amortizationRate;
-		}
-
-		public double getCurrentMachinePrice() {
-			return currentMachinePrice;
-		}
-	}
-
 	private class VMUsageRecord implements VirtualMachine.StateChange {
 		public final VirtualMachine vm;
 		private long startofUsage = -1;
@@ -110,14 +89,11 @@ public class CostAnalyserandPricer extends Timed
 	}
 
 	public static final double PUE = 1.6;
-	// 45HUF/kwh, the divider is because we calculate in Wms.
-	public static final double electricityCost = 45 / 3600000000.0;
-	public static final double hourlyAmortisaiton = ((double) Constants.anHour) / Constants.machineLifeTime;
-	public static final double perMachineCost = 1000000; // HUF
-
+	// 12pence/kwh, the divider is because we calculate in Wms.
+	public static final double electricityCost = 0.12 / 3600000000.0;
 	private final IaaSService service;
 	private final IaaSEnergyMeter meter;
-	private final ArrayList<PMAmortizationRecord> pmrecords = new ArrayList<CostAnalyserandPricer.PMAmortizationRecord>();
+	private final ArrayList<PMPriceRecord> pmrecords = new ArrayList<PMPriceRecord>();
 	private final ArrayList<VMUsageRecord> vmrecords = new ArrayList<VMUsageRecord>();
 	private double lastMeterReading = 0;
 	private double totalCosts = 0;
@@ -138,7 +114,7 @@ public class CostAnalyserandPricer extends Timed
 		service.subscribeToCapacityChanges(this);
 		((IaaSForwarder) service).setVMListener(this);
 		for (PhysicalMachine pm : service.machines) {
-			pmrecords.add(new PMAmortizationRecord(pm));
+			pmrecords.add(new PMPriceRecord(pm));
 		}
 	}
 
@@ -158,7 +134,7 @@ public class CostAnalyserandPricer extends Timed
 		totalCosts += consumption;
 
 		double currentAssets = 0;
-		for (PMAmortizationRecord pma : pmrecords) {
+		for (PMPriceRecord pma : pmrecords) {
 			pma.amortizefor(24);
 			currentAssets += pma.getCurrentMachinePrice();
 		}
@@ -193,16 +169,17 @@ public class CostAnalyserandPricer extends Timed
 		if (newRegistration) {
 			// Buying resources
 			for (PhysicalMachine pm : affectedCapacity) {
-				PMAmortizationRecord pma = new PMAmortizationRecord(pm);
+				PMPriceRecord pma = new PMPriceRecord(pm);
 				pmrecords.add(pma);
 				totalCosts += pma.getCurrentMachinePrice();
 			}
 		} else {
 			// Selling resources
 			for (PhysicalMachine pm : affectedCapacity) {
-				for (PMAmortizationRecord pma : pmrecords) {
+				for (PMPriceRecord pma : pmrecords) {
 					if (pma.pm == pm) {
 						totalEarnings += pma.getCurrentMachinePrice();
+						pmrecords.remove(pma);
 						break;
 					}
 				}

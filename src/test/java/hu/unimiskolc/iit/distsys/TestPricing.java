@@ -23,6 +23,7 @@
 package hu.unimiskolc.iit.distsys;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -45,7 +46,6 @@ public class TestPricing implements MultiCloudUser.CompletionCallback {
 	private ArrayList<DeferredEvent> obsolitionEvents = new ArrayList<DeferredEvent>();
 	public static final int totalUserCount = 10;
 	public static final int initialMachineCount = 30;
-	private IaaSService ourService, theCompetition;
 	private CostAnalyserandPricer ourAnalyser, competitionAnalyser;
 	private int completeUserCount = 0;
 
@@ -124,6 +124,7 @@ public class TestPricing implements MultiCloudUser.CompletionCallback {
 
 	@Before
 	public void preparePricing() throws Exception {
+		IaaSService ourService, theCompetition;
 		ourService = ExercisesBase.getNewIaaSService();
 		do {
 			theCompetition = ExercisesBase.getNewIaaSService();
@@ -138,12 +139,16 @@ public class TestPricing implements MultiCloudUser.CompletionCallback {
 		CloudProvider competition = TestCreatorFactory.getDefaultProvider();
 		competition.setIaaSService(theCompetition);
 		int baseDelay = 0;
+		final ArrayList<IaaSService> iaasList = new ArrayList<IaaSService>();
+		iaasList.add(ourService);
+		iaasList.add(theCompetition);
 		for (int i = 0; i < totalUserCount; i++) {
 			new DeferredEvent(baseDelay) {
 				@Override
 				protected void eventAction() {
 					try {
-						new MultiCloudUser(new IaaSService[] { ourService, theCompetition }, TestPricing.this);
+						Collections.shuffle(iaasList);
+						new MultiCloudUser(iaasList.toArray(new IaaSService[2]), TestPricing.this);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}

@@ -27,7 +27,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.unimiskolc.iit.distsys.forwarders.PMForwarder;
 
-class PMPriceRecord {
+public class PMPriceRecord {
 	public static final double hourlyAmortisaiton = ((double) Constants.anHour) / Constants.machineLifeTime;
 	public static final double perMachineBaseCost = 3000; // GBP
 	public static final double maxResourceCombination = ExercisesBase.maxCoreCount * ExercisesBase.maxProcessingCap

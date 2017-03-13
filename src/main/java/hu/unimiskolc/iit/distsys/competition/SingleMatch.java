@@ -157,6 +157,7 @@ public class SingleMatch implements MultiCloudUser.CompletionCallback, Scorer {
 			throw new RuntimeException("Attemted to run a match two times");
 		} else {
 			Timed.resetTimed();
+			ExercisesBase.reset();
 			long startTime = System.currentTimeMillis();
 
 			// Prepares two providers with the same VM/PM schedulers

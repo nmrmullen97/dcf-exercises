@@ -18,6 +18,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  with dcf-exercises.  If not, see <http://www.gnu.org/licenses/>.
  *  
+ *  (C) Copyright 2017, Gabor Kecskemeti (g.kecskemeti@ljmu.ac.uk)
  *  (C) Copyright 2015, Gabor Kecskemeti (kecskemeti@iit.uni-miskolc.hu)
  */
 package hu.unimiskolc.iit.distsys;
@@ -37,6 +38,7 @@ public class FaultInjector extends Timed {
 	private final double likelyHood;
 
 	public FaultInjector(long faultFreq, double faultLikelyHood, IaaSService iaas) {
+		simulationisComplete=false;
 		subscribe(faultFreq);
 		this.iaas = iaas;
 		likelyHood = faultLikelyHood;

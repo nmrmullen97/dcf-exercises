@@ -18,25 +18,13 @@
  *  You should have received a copy of the GNU General Public License along
  *  with dcf-exercises.  If not, see <http://www.gnu.org/licenses/>.
  *  
- *  (C) Copyright 2015, Gabor Kecskemeti (kecskemeti@iit.uni-miskolc.hu)
+ *  (C) Copyright 2017, Gabor Kecskemeti (g.kecskemeti@ljmu.ac.uk)
  */
-package hu.unimiskolc.iit.distsys;
+package hu.unimiskolc.iit.distsys.competition;
 
-import org.junit.Assert;
-import org.junit.Test;
+public interface Scorer {
+	public int getPointsForTeamOne();
 
-import hu.unimiskolc.iit.distsys.competition.SingleMatch;
+	public int getPointsForTeamTwo();
 
-public class TestPricing {
-
-	@Test(timeout = 60000)
-	public void thePricingTest() throws Exception {
-		SingleMatch match = new SingleMatch(TestCreatorFactory.getNewProvider().getClass(),
-				TestCreatorFactory.getDefaultProvider().getClass());
-		match.runMatch();
-		Assert.assertTrue("The final balance of the provider should be positive!", match.getPointsForTeamOne() > 0);
-		Assert.assertTrue(
-				"The balance of the new provider should be greater than the balance of the built in provider!",
-				match.getPointsForTeamOne() > 1);
-	}
 }

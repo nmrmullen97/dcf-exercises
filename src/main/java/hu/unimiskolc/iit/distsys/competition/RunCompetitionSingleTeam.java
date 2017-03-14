@@ -35,13 +35,13 @@ public class RunCompetitionSingleTeam {
 			competition.addToCompetitors(cp);
 		}
 		ArrayList<ProviderRanking> rankings;
-		System.err.println("Starting competition!");
+		System.out.println("Starting competition!");
 		competition.arrangeSets();
 		competition.runSets();
 		rankings = competition.getRankedList();
-		System.err.println("Competition finished. League table:");
+		System.out.println("Competition finished. League table:");
 		for (int i = 0; i < rankings.size(); i++) {
-			System.err.println((i + 1) + ". " + rankings.get(i));
+			System.out.println((i + 1) + ". " + rankings.get(i));
 		}
 
 	}

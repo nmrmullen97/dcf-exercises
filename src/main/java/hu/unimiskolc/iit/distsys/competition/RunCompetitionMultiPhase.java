@@ -73,18 +73,18 @@ public class RunCompetitionMultiPhase {
 		// By now teams are set, we are good to go
 		
 		ArrayList<ProviderRanking> rankings = new ArrayList<ProviderRanking>();
-		System.err.println("Starting team competition phase!");
+		System.out.println("Starting team competition phase!");
 		int groupIndex = 1;
 		for (TeamCompetition tc : competitions) {
-			System.err.println("Starting team " + groupIndex);
+			System.out.println("Starting team " + groupIndex);
 			tc.arrangeSets();
 			tc.runSets();
 			// merge the rankings across all groups
 			rankings.addAll(tc.getRankedList());
-			System.err.println("Completed team " + groupIndex);
+			System.out.println("Completed team " + groupIndex);
 			groupIndex++;
 		}
-		System.err.println("Team competitions finished. Merged rankings:");
+		System.out.println("Team competitions finished. Merged rankings:");
 		
 		// We sort all providers to see who performed the best in each group
 		Collections.sort(rankings);
@@ -94,17 +94,17 @@ public class RunCompetitionMultiPhase {
 			if (topProviders.size() < 8) {
 				topProviders.add(pr.provider);
 			}
-			System.err.println(pr);
+			System.out.println(pr);
 		}
 		
 		//Knockout phase
-		System.err.println("Sinlge elimination tournament starts.......");
+		System.out.println("Sinlge elimination tournament starts.......");
 		topProviders = SingleEliminationTournament.runCompetition(topProviders);
 		
 		// Results
-		System.err.println("Sinlge elimination tournament completed final league table:");
+		System.out.println("Sinlge elimination tournament completed final league table:");
 		for (int i = 0; i < topProviders.size(); i++) {
-			System.err.println((i + 1) + ". " + topProviders.get(i).getName());
+			System.out.println((i + 1) + ". " + topProviders.get(i).getName());
 		}
 	}
 

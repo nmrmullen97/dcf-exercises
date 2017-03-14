@@ -47,8 +47,8 @@ public class SingleSet implements Scorer {
 	}
 
 	public void runSet() throws Exception {
-		System.err.println("~~~~~~~ Starting set ~~~~~~~");
-		System.err.println(this);
+		System.out.println("~~~~~~~ Starting set ~~~~~~~");
+		System.out.println(this);
 		if (sumSubScoreOne < 0) {
 			// On the first run we initialize the scores
 			sumSubScoreOne = 0;
@@ -58,7 +58,7 @@ public class SingleSet implements Scorer {
 			if (!m.isMatchRan()) {
 				// Matches ran only once
 				m.runMatch();
-				System.err.println(m);
+				System.out.println(m);
 
 				// Accumulate scores
 				if (m.cpOne == cpOne) {
@@ -70,8 +70,8 @@ public class SingleSet implements Scorer {
 				}
 			}
 		}
-		System.err.println(this);
-		System.err.println("~~~~~~~ End of set ~~~~~~~");
+		System.out.println(this);
+		System.out.println("~~~~~~~ End of set ~~~~~~~");
 	}
 
 	@Override

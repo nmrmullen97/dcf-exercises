@@ -27,13 +27,13 @@ import java.util.Collections;
 
 import hu.unimiskolc.iit.distsys.interfaces.CloudProvider;
 
-public class RunCompetition {
+public class RunCompetitionMultiPhase {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
 		TeamCompetition[] competitions = new TeamCompetition[(args.length + 3) / 4];
 		for (int i = 0; i < competitions.length; i++) {
-			competitions[i] = new TeamCompetition();
+			competitions[i] = new TeamCompetition(true);
 		}
 		for (int i = 0; i < args.length; i++) {
 			// Round robin assignment to teams
@@ -42,10 +42,14 @@ public class RunCompetition {
 		}
 		ArrayList<ProviderRanking> rankings = new ArrayList<ProviderRanking>();
 		System.err.println("Starting team competition phase!");
+		int groupIndex = 1;
 		for (TeamCompetition tc : competitions) {
+			System.err.println("Starting team " + groupIndex);
 			tc.arrangeSets();
 			tc.runSets();
 			rankings.addAll(tc.getRankedList());
+			System.err.println("Completed team " + groupIndex);
+			groupIndex++;
 		}
 		System.err.println("Team competitions finished. Merged rankings:");
 		Collections.sort(rankings);
@@ -55,7 +59,7 @@ public class RunCompetition {
 			if (topProviders.size() < 8) {
 				topProviders.add(pr.provider);
 			}
-			System.out.println(pr);
+			System.err.println(pr);
 		}
 		System.err.println("Sinlge elimination tournament starts.......");
 		topProviders = SingleEliminationTournament.runCompetition(topProviders);

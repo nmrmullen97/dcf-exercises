@@ -27,11 +27,12 @@ import java.util.ArrayList;
 import hu.unimiskolc.iit.distsys.interfaces.CloudProvider;
 
 public class RunCompetitionSingleTeam {
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
 		TeamCompetition competition = new TeamCompetition(false);
-		for (int i = 0; i < args.length; i++) {
-			competition.addToCompetitors((Class<? extends CloudProvider>) Class.forName(args[i]));
+		ArrayList<Class<? extends CloudProvider>> preList = RunCompetitionMultiPhase.parseCompetingClassNames(args);
+		// All competitors into a single team competition
+		for (Class<? extends CloudProvider> cp : preList) {
+			competition.addToCompetitors(cp);
 		}
 		ArrayList<ProviderRanking> rankings;
 		System.err.println("Starting competition!");

@@ -39,6 +39,8 @@ public class SingleSet implements Scorer {
 		cps.add(cpOne);
 		cps.add(cpTwo);
 		for (int i = 0; i < matches.length; i++) {
+			// Randomise the match participant order so our outcome depends less
+			// on the order we received the providers
 			Collections.shuffle(cps);
 			matches[i] = new SingleMatch(cps.get(0), cps.get(1));
 		}

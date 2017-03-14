@@ -53,6 +53,7 @@ public class TeamCompetition {
 		if (competitors.size() < 3) {
 			throw new RuntimeException("No group is allowed to have less than 3 members!");
 		}
+		Collections.shuffle(competitors);
 		for (int i = 0; i < competitors.size() - 1; i++) {
 			for (int j = i + 1; j < competitors.size(); j++) {
 				sets.add(new SingleSet(competitors.get(i), competitors.get(j)));

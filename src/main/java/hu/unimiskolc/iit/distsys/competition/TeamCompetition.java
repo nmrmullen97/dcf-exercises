@@ -29,9 +29,9 @@ import java.util.HashMap;
 import hu.unimiskolc.iit.distsys.interfaces.CloudProvider;
 
 public class TeamCompetition {
-	private final ArrayList<Class<? extends CloudProvider>> competitors = new ArrayList<>();
-	private final ArrayList<SingleSet> sets = new ArrayList<>();
-	private final HashMap<Class<? extends CloudProvider>, Integer> resultsTable = new HashMap<>();
+	private final ArrayList<Class<? extends CloudProvider>> competitors = new ArrayList<Class<? extends CloudProvider>>();
+	private final ArrayList<SingleSet> sets = new ArrayList<SingleSet>();
+	private final HashMap<Class<? extends CloudProvider>, Integer> resultsTable = new HashMap<Class<? extends CloudProvider>, Integer>();
 
 	public void addToCompetitors(Class<? extends CloudProvider> toAdd) {
 		competitors.add(toAdd);
@@ -85,7 +85,7 @@ public class TeamCompetition {
 		if (resultsTable.isEmpty()) {
 			throw new RuntimeException("Should run the sets first!");
 		} else {
-			ArrayList<ProviderRanking> ranking = new ArrayList<>();
+			ArrayList<ProviderRanking> ranking = new ArrayList<ProviderRanking>();
 			for (Class<? extends CloudProvider> cp : competitors) {
 				ranking.add(new ProviderRanking(cp, resultsTable.get(cp)));
 			}

@@ -35,7 +35,7 @@ public class SingleSet implements Scorer {
 	public SingleSet(Class<? extends CloudProvider> cpOne, Class<? extends CloudProvider> cpTwo) throws Exception {
 		this.cpOne = cpOne;
 		this.cpTwo = cpTwo;
-		ArrayList<Class<? extends CloudProvider>> cps = new ArrayList<>();
+		ArrayList<Class<? extends CloudProvider>> cps = new ArrayList<Class<? extends CloudProvider>>();
 		cps.add(cpOne);
 		cps.add(cpTwo);
 		for (int i = 0; i < matches.length; i++) {

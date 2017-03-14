@@ -40,7 +40,7 @@ public class RunCompetition {
 			competitions[i % competitions.length]
 					.addToCompetitors((Class<? extends CloudProvider>) Class.forName(args[i]));
 		}
-		ArrayList<ProviderRanking> rankings = new ArrayList<>();
+		ArrayList<ProviderRanking> rankings = new ArrayList<ProviderRanking>();
 		System.err.println("Starting team competition phase!");
 		for (TeamCompetition tc : competitions) {
 			tc.arrangeSets();
@@ -49,7 +49,7 @@ public class RunCompetition {
 		}
 		System.err.println("Team competitions finished. Merged rankings:");
 		Collections.sort(rankings);
-		ArrayList<Class<? extends CloudProvider>> topProviders = new ArrayList<>();
+		ArrayList<Class<? extends CloudProvider>> topProviders = new ArrayList<Class<? extends CloudProvider>>();
 		for (ProviderRanking pr : rankings) {
 			// Only the first 8 team goes to the knockout phase
 			if (topProviders.size() < 8) {

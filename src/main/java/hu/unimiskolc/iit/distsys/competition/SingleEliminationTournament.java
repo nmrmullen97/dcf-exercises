@@ -35,8 +35,8 @@ public class SingleEliminationTournament {
 		if (currentCompetitors.size() % 2 != 0) {
 			throw new RuntimeException("Cannot process non-even membered tournaments");
 		}
-		ArrayList<Class<? extends CloudProvider>> winners = new ArrayList<>();
-		ArrayList<Class<? extends CloudProvider>> losers = new ArrayList<>();
+		ArrayList<Class<? extends CloudProvider>> winners = new ArrayList<Class<? extends CloudProvider>>();
+		ArrayList<Class<? extends CloudProvider>> losers = new ArrayList<Class<? extends CloudProvider>>();
 		for (int i = 0; i < currentCompetitors.size() - 1; i += 2) {
 			int miniRounds = 0;
 			SingleSet ss;

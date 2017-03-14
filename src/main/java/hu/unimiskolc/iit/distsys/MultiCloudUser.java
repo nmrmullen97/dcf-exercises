@@ -163,17 +163,12 @@ public class MultiCloudUser extends Timed {
 						@Override
 						protected void eventAction() {
 							if (isVMAccessible(vm)) {
-								boolean allComplete = true;
 								for (ProviderRecord pr : records) {
 									try {
 										pr.destroyVM(vm);
-										allComplete |= pr.myVMSet.size() == 0;
 									} catch (VMManagementException e) {
 										throw new RuntimeException(e);
 									}
-								}
-								if (allComplete && prepareForCompletion) {
-									callback.alljobsComplete();
 								}
 							}
 						}
@@ -277,6 +272,27 @@ public class MultiCloudUser extends Timed {
 		if (minindex == jobs.size()) {
 			unsubscribe();
 			prepareForCompletion = true;
+			// This class ensures the MCU to send its termination signal
+			class MCUTerminator extends Timed {
+				public MCUTerminator() {
+					subscribe(Constants.anHour);
+				}
+
+				@Override
+				public void tick(long fires) {
+					// We just check if there are no more VMs and no more jobs
+					// to do
+					boolean allComplete = true;
+					for (ProviderRecord pr : records) {
+						allComplete |= pr.myVMSet.size() == 0;
+					}
+					if (allComplete && prepareForCompletion) {
+						callback.alljobsComplete();
+						unsubscribe();
+					}
+				}
+			}
+			new MCUTerminator();
 		}
 	}
 

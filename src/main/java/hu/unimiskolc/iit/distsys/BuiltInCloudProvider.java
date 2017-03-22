@@ -35,7 +35,7 @@ import hu.unimiskolc.iit.distsys.forwarders.IaaSForwarder;
 import hu.unimiskolc.iit.distsys.interfaces.CloudProvider;
 
 public class BuiltInCloudProvider implements CloudProvider, VMManager.CapacityChangeEvent<PhysicalMachine> {
-	IaaSService myProvidedService;
+	protected IaaSService myProvidedService;
 
 	@Override
 	public void setIaaSService(IaaSService iaas) {

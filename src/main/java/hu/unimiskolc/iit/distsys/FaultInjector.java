@@ -36,12 +36,14 @@ public class FaultInjector extends Timed {
 	private ArrayList<PMDeregPreparator> myHandlers = new ArrayList<PMDeregPreparator>();
 	private final IaaSService iaas;
 	private final double likelyHood;
+	private boolean readd;
 
-	public FaultInjector(long faultFreq, double faultLikelyHood, IaaSService iaas) {
-		simulationisComplete=false;
+	public FaultInjector(long faultFreq, double faultLikelyHood, IaaSService iaas, boolean readdMachines) {
+		simulationisComplete = false;
 		subscribe(faultFreq);
 		this.iaas = iaas;
 		likelyHood = faultLikelyHood;
+		readd = readdMachines;
 	}
 
 	@Override
@@ -69,21 +71,23 @@ public class FaultInjector extends Timed {
 							// drops the old machine
 							iaas.deregisterHost(forPM.pm);
 
-							// adds a new host so we are not short of
-							// hosts
-							PhysicalMachine newPM = null;
-							do {
-								if (newPM != null) {
-									ExercisesBase.dropPM(newPM);
-								}
-								newPM = ExercisesBase.getNewPhysicalMachine();
-								// let's throw away those replacements
-								// that are
-								// having too little CPU counts for our
-								// purposes
-							} while (newPM.getCapacities().getRequiredCPUs() < forPM.pm.getCapacities()
-									.getRequiredCPUs());
-							iaas.registerHost(newPM);
+							if (readd) {
+								// adds a new host so we are not short of
+								// hosts
+								PhysicalMachine newPM = null;
+								do {
+									if (newPM != null) {
+										ExercisesBase.dropPM(newPM);
+									}
+									newPM = ExercisesBase.getNewPhysicalMachine();
+									// let's throw away those replacements
+									// that are
+									// having too little CPU counts for our
+									// purposes
+								} while (newPM.getCapacities().getRequiredCPUs() < forPM.pm.getCapacities()
+										.getRequiredCPUs());
+								iaas.registerHost(newPM);
+							}
 							myHandlers.remove(forPM);
 						} catch (Exception e) {
 							throw new RuntimeException(e);

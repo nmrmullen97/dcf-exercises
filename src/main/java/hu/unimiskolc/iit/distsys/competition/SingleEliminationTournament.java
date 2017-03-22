@@ -23,6 +23,7 @@
 package hu.unimiskolc.iit.distsys.competition;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.apache.commons.lang3.RandomUtils;
 
@@ -30,13 +31,28 @@ import hu.unimiskolc.iit.distsys.interfaces.CloudProvider;
 
 public class SingleEliminationTournament {
 
+	/**
+	 * This function runs a single elimination tournament to order the current
+	 * competitors list according to their strength. By the end of the run, all
+	 * competitors in the currentCompetitors list will be ordered.
+	 * 
+	 * <i>Note:</i> as the function uses recursion, you should restrict the size
+	 * of the knockout phase to numbers that would fit in the stack.
+	 * 
+	 * @param currentCompetitors
+	 *            the list of competitors to be ordered
+	 * @return the ordered list of competitors by strength (the first item in
+	 *         the list is the strongest, the last is the weakest)
+	 * @throws Exception
+	 */
 	public static ArrayList<Class<? extends CloudProvider>> runCompetition(
 			ArrayList<Class<? extends CloudProvider>> currentCompetitors) throws Exception {
 		if (currentCompetitors.size() % 2 != 0) {
 			throw new RuntimeException("Cannot process non-even membered tournaments");
 		}
-		ArrayList<Class<? extends CloudProvider>> winners = new ArrayList<>();
-		ArrayList<Class<? extends CloudProvider>> losers = new ArrayList<>();
+		Collections.shuffle(currentCompetitors);
+		ArrayList<Class<? extends CloudProvider>> winners = new ArrayList<Class<? extends CloudProvider>>();
+		ArrayList<Class<? extends CloudProvider>> losers = new ArrayList<Class<? extends CloudProvider>>();
 		for (int i = 0; i < currentCompetitors.size() - 1; i += 2) {
 			int miniRounds = 0;
 			SingleSet ss;

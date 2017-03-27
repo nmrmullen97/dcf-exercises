@@ -29,7 +29,7 @@ import hu.unimiskolc.iit.distsys.interfaces.CloudProvider;
 public class RunCompetitionSingleTeam {
 	public static void main(String[] args) throws Exception {
 		TeamCompetition competition = new TeamCompetition(false);
-		ArrayList<Class<? extends CloudProvider>> preList = RunCompetitionMultiPhase.parseCompetingClassNames(args);
+		ArrayList<Class<? extends CloudProvider>> preList = RunCompetitionMultiPhase.parseCompetingClassNames(args, 3);
 		// All competitors into a single team competition
 		for (Class<? extends CloudProvider> cp : preList) {
 			competition.addToCompetitors(cp);

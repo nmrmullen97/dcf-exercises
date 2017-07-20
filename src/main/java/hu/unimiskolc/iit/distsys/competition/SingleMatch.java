@@ -122,7 +122,7 @@ public class SingleMatch implements MultiCloudUser.CompletionCallback, Scorer {
 		});
 
 		// Every hour we set the PMs a small likely-hood to fail
-		new FaultInjector(Constants.anHour, Constants.machineHourlyFailureRate, service);
+		new FaultInjector(Constants.anHour, Constants.machineHourlyFailureRate, service, false);
 
 		// Here we create the initial cloud infrastructures
 		final int maxPMCount = 10000;

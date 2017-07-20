@@ -39,9 +39,10 @@ public class RunCompetitionMultiPhase {
 	 *         in the competition
 	 */
 	@SuppressWarnings("unchecked")
-	public static ArrayList<Class<? extends CloudProvider>> parseCompetingClassNames(String[] args) {
-		if (args.length < 8) {
+	public static ArrayList<Class<? extends CloudProvider>> parseCompetingClassNames(String[] args, int minProviders) {
+		if (args.length < minProviders) {
 			System.err.println("There are not enough providers listed in the cli argument list.");
+			System.err.println("You should specify at least " + minProviders + ".");
 			System.err.println("Please use the following format: RunCompetition [FullyQualifiedClassName]*");
 			System.exit(1);
 		}
@@ -61,7 +62,7 @@ public class RunCompetitionMultiPhase {
 
 	public static void main(String[] args) throws Exception {
 		// Preparing the teams
-		ArrayList<Class<? extends CloudProvider>> preList = parseCompetingClassNames(args);
+		ArrayList<Class<? extends CloudProvider>> preList = parseCompetingClassNames(args, 8);
 		TeamCompetition[] competitions = new TeamCompetition[(args.length + 3) / 4];
 		for (int i = 0; i < competitions.length; i++) {
 			competitions[i] = new TeamCompetition(true);
@@ -71,7 +72,7 @@ public class RunCompetitionMultiPhase {
 			competitions[i % competitions.length].addToCompetitors(preList.get(i));
 		}
 		// By now teams are set, we are good to go
-		
+
 		ArrayList<ProviderRanking> rankings = new ArrayList<ProviderRanking>();
 		System.out.println("Starting team competition phase!");
 		int groupIndex = 1;
@@ -85,7 +86,7 @@ public class RunCompetitionMultiPhase {
 			groupIndex++;
 		}
 		System.out.println("Team competitions finished. Merged rankings:");
-		
+
 		// We sort all providers to see who performed the best in each group
 		Collections.sort(rankings);
 		ArrayList<Class<? extends CloudProvider>> topProviders = new ArrayList<Class<? extends CloudProvider>>();
@@ -96,11 +97,11 @@ public class RunCompetitionMultiPhase {
 			}
 			System.out.println(pr);
 		}
-		
-		//Knockout phase
+
+		// Knockout phase
 		System.out.println("Sinlge elimination tournament starts.......");
 		topProviders = SingleEliminationTournament.runCompetition(topProviders);
-		
+
 		// Results
 		System.out.println("Sinlge elimination tournament completed final league table:");
 		for (int i = 0; i < topProviders.size(); i++) {

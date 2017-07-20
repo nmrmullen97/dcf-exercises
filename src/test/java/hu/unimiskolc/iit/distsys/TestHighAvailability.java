@@ -98,7 +98,7 @@ public class TestHighAvailability {
 		// Preparing the scheduling
 		new JobtoVMScheduler(myIaaS, jobs);
 		// Prepares the faulty PMs
-		new FaultInjector(120000, 1 - Constants.pmAvailability, myIaaS);
+		new FaultInjector(120000, 1 - Constants.pmAvailability, myIaaS, true);
 		new DeferredEvent(lastTermination) {
 			// Ensures that the fault injector code terminates
 			@Override

@@ -23,6 +23,9 @@
 
 package hu.unimiskolc.iit.distsys.forwarders;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import hu.mta.sztaki.lpds.cloud.simulator.energy.powermodelling.PowerState;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
@@ -30,9 +33,6 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
 import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
-
-import java.util.EnumMap;
-import java.util.HashMap;
 
 public class PMForwarder extends PhysicalMachine implements ForwardingRecorder {
 	private boolean reqVMCalled = false;
@@ -50,18 +50,15 @@ public class PMForwarder extends PhysicalMachine implements ForwardingRecorder {
 	 * @param onD
 	 * @param offD
 	 * @param powerTransitions
-	 * @param reliMult The higher the value the less reliable the machine is
+	 * @param reliMult
+	 *            The higher the value the less reliable the machine is
 	 */
 	public PMForwarder(double cores, double perCorePocessing, long memory, Repository disk, int onD, int offD,
-			EnumMap<PowerStateKind, EnumMap<State, PowerState>> powerTransitions, double reliMult) {
+			Map<String, PowerState> powerTransitions, double reliMult) {
 		super(cores, perCorePocessing, memory, disk, onD, offD, powerTransitions);
 		this.reliMult = reliMult;
-		double collectedConsumptionData = 0;
-		for (EnumMap<State, PowerState> psData : powerTransitions.values()) {
-			PowerState maxConsumingState = psData.get(PhysicalMachine.State.RUNNING);
-			collectedConsumptionData += maxConsumingState.getConsumptionRange() + maxConsumingState.getMinConsumption();
-		}
-		maxConsumption = collectedConsumptionData;
+		PowerState maxConsumingState = powerTransitions.get(PhysicalMachine.State.RUNNING.toString());
+		maxConsumption = maxConsumingState.getConsumptionRange() + maxConsumingState.getMinConsumption();
 	}
 
 	public void resetForwardingData() {

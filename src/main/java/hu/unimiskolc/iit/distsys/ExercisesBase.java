@@ -22,6 +22,7 @@
  */
 package hu.unimiskolc.iit.distsys;
 
+import hu.mta.sztaki.lpds.cloud.simulator.energy.powermodelling.PowerState;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.IaaSService;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.pmscheduling.AlwaysOnMachines;
@@ -43,8 +44,10 @@ import hu.unimiskolc.iit.distsys.forwarders.PMForwarder;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.RandomUtils;
 
@@ -85,8 +88,7 @@ public class ExercisesBase {
 	public static List<IaaSForwarder> iaasforwarders = Collections.unmodifiableList(ifs);
 
 	/**
-	 * Generates a new name for a networked entity and registers it in the
-	 * network
+	 * Generates a new name for a networked entity and registers it in the network
 	 * 
 	 * @param prefix
 	 * @return
@@ -98,22 +100,52 @@ public class ExercisesBase {
 	}
 
 	/**
-	 * Constructs a repository with a bandwidth and storage multiplier compared
-	 * to the PM related class wide constants defined above
+	 * Constructs a repository with a bandwidth and storage multiplier compared to
+	 * the PM related class wide constants defined above
 	 * 
 	 * @param multiplier
 	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws SecurityException
 	 */
-	public static Repository getNewRepository(final long multiplier) {
-		final long networkBW = RandomUtils.nextLong(multiplier * minPMInBW, multiplier * maxPMInBW);
-		return new Repository(RandomUtils.nextLong(multiplier * minDisk, multiplier * maxDisk), genNewName("PM"),
-				networkBW, networkBW, networkBW / 2, latencyMap);
+	public static Repository getNewRepository(final long multiplier)
+			throws SecurityException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+		return getNewRepository(multiplier, null);
 	}
 
 	/**
-	 * Generates a random physical machine (and registers it in the network),
-	 * the generated PM is going to have resources within the limits of the
-	 * class wide constants
+	 * Constructs a repository with a bandwidth and storage multiplier compared to
+	 * the PM related class wide constants defined above
+	 * 
+	 * @param multiplier
+	 * @param tr
+	 *            if not null, these will be the transitions to be used instead of a
+	 *            newly generated one
+	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws SecurityException
+	 */
+	private static Repository getNewRepository(final long multiplier,
+			EnumMap<PowerTransitionGenerator.PowerStateKind, Map<String, PowerState>> tr)
+			throws SecurityException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+		final long networkBW = RandomUtils.nextLong(multiplier * minPMInBW, multiplier * maxPMInBW);
+		EnumMap<PowerTransitionGenerator.PowerStateKind, Map<String, PowerState>> transitions = tr == null
+				? genRealisticPowerTransitions()
+				: tr;
+		return new Repository(RandomUtils.nextLong(multiplier * minDisk, multiplier * maxDisk), genNewName("PM"),
+				networkBW, networkBW, networkBW / 2, latencyMap,
+				transitions.get(PowerTransitionGenerator.PowerStateKind.storage),
+				transitions.get(PowerTransitionGenerator.PowerStateKind.network));
+	}
+
+	/**
+	 * Generates a random physical machine (and registers it in the network), the
+	 * generated PM is going to have resources within the limits of the class wide
+	 * constants
 	 * 
 	 * @return
 	 * @throws SecurityException
@@ -127,9 +159,9 @@ public class ExercisesBase {
 	}
 
 	/**
-	 * Generates a random physical machine (and registers it in the network),
-	 * the generated PM is going to have resources within the limits of the
-	 * class wide constants
+	 * Generates a random physical machine (and registers it in the network), the
+	 * generated PM is going to have resources within the limits of the class wide
+	 * constants
 	 * 
 	 * @param reliMult
 	 *            Determines the level of reliability the particular Physical
@@ -142,17 +174,22 @@ public class ExercisesBase {
 	 */
 	public static PhysicalMachine getNewPhysicalMachine(final double reliMult)
 			throws SecurityException, InstantiationException, IllegalAccessException, NoSuchFieldException {
-		double idlePower = RandomUtils.nextDouble(minIdlePower, maxIdlePower);
-		double realMinMaxPower = Math.max(idlePower, minMaxPower);
+		EnumMap<PowerTransitionGenerator.PowerStateKind, Map<String, PowerState>> transitions = genRealisticPowerTransitions();
 		PMForwarder f = new PMForwarder((double) RandomUtils.nextInt(1, maxCoreCount),
 				RandomUtils.nextDouble(minProcessingCap, maxProcessingCap), RandomUtils.nextLong(minMem, maxMem),
-				getNewRepository(1), SeedSyncer.centralRnd.nextInt(maxOnDelay),
+				getNewRepository(1, transitions), SeedSyncer.centralRnd.nextInt(maxOnDelay),
 				SeedSyncer.centralRnd.nextInt(maxOffDelay),
-				PowerTransitionGenerator.generateTransitions(RandomUtils.nextDouble(minMinPower, maxMinPower),
-						idlePower, RandomUtils.nextDouble(realMinMaxPower, maxMaxPower), 30, 40),
-				reliMult);
+				transitions.get(PowerTransitionGenerator.PowerStateKind.host), reliMult);
 		pmfs.add(f);
 		return f;
+	}
+
+	public static EnumMap<PowerTransitionGenerator.PowerStateKind, Map<String, PowerState>> genRealisticPowerTransitions()
+			throws SecurityException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+		double idlePower = RandomUtils.nextDouble(minIdlePower, maxIdlePower);
+		double realMinMaxPower = Math.max(idlePower, minMaxPower);
+		return PowerTransitionGenerator.generateTransitions(RandomUtils.nextDouble(minMinPower, maxMinPower), idlePower,
+				RandomUtils.nextDouble(realMinMaxPower, maxMaxPower), 30, 40);
 	}
 
 	public static void dropPM(PhysicalMachine pm) {
@@ -182,8 +219,8 @@ public class ExercisesBase {
 
 	/**
 	 * Creates a complex IaaS infrastructure with a predefined amount of random
-	 * physical machines. The IaaS will use undefined schedulers (randomly
-	 * chosen according to getNewIaaSService.
+	 * physical machines. The IaaS will use undefined schedulers (randomly chosen
+	 * according to getNewIaaSService.
 	 * 
 	 * @param pmCount
 	 * @return

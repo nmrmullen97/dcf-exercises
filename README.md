@@ -1,6 +1,8 @@
 # dcf-exercises
 A few exercises to get familiar with some distributed system concepts and their simulations.
-git
+
+
+test 4
 
 ## Covered exercises
 This project provides the following exercises and even offers some simplistic solutions for students of distributed systems:

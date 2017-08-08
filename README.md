@@ -2,7 +2,7 @@
 A few exercises to get familiar with some distributed system concepts and their simulator
 
 
-another attempt 
+why is this not working again 
 
 
 ## Covered exercises

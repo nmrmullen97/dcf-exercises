@@ -1,7 +1,8 @@
 # dcf-exercises
-A few exercises to get familiar with some distributed system concepts and their simulations.
+A few exercises to get familiar with some distributed system concepts and their simulator
 
-please work
+
+another attempt 
 
 
 ## Covered exercises
